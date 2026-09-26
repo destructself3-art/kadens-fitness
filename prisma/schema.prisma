@@ -1,0 +1,129 @@
+// Kadens data model.
+// SQLite locally; nothing here is SQLite-specific, so switching the provider to postgresql is a one-line change.
+// Descriptive content (texts, photos, prices) lives in src/data; the database keeps what changes at runtime:
+// the schedule, bookings and leads.
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+/// A room where classes take place. Slug matches src/data/spaces.ts.
+model Studio {
+  id       String    @id @default(cuid())
+  slug     String    @unique
+  name     String
+  capacity Int
+  sort     Int       @default(0)
+  sessions Session[]
+}
+
+/// A class format, e.g. "Сайкл". Slug matches src/data/classes.ts.
+model ClassType {
+  id          String    @id @default(cuid())
+  slug        String    @unique
+  title       String
+  /// Heart-rate zone the class is built around, 1..5
+  zone        Int
+  durationMin Int
+  sort        Int       @default(0)
+  sessions    Session[]
+}
+
+/// Slug matches src/data/coaches.ts.
+model Coach {
+  id          String    @id @default(cuid())
+  slug        String    @unique
+  name        String
+  /// The coach's usual heart-rate zone, 1..5
+  zone        Int
+  active      Boolean   @default(true)
+  sort        Int       @default(0)
+  sessions    Session[] @relation("lead")
+  substitutes Session[] @relation("substitute")
+}
+
+/// One class on the calendar. Generated from the weekly timetable (src/data/timetable.ts) week by week.
+model Session {
+  id           String    @id @default(cuid())
+  classTypeId  String
+  classType    ClassType @relation(fields: [classTypeId], references: [id])
+  studioId     String
+  studio       Studio    @relation(fields: [studioId], references: [id])
+  coachId      String
+  coach        Coach     @relation("lead", fields: [coachId], references: [id])
+  /// Set by the admin when another coach replaces the regular one
+  substituteId String?
+  substitute   Coach?    @relation("substitute", fields: [substituteId], references: [id])
+  startsAt     DateTime
+  endsAt       DateTime
+  capacity     Int
+  /// scheduled | cancelled
+  status       String    @default("scheduled")
+  /// Short public note, e.g. "Замена тренера" or "Перенесено в «Кузню»"
+  note         String?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  bookings     Booking[]
+
+  /// One class per studio at a time; also makes week generation idempotent.
+  @@unique([studioId, startsAt])
+  @@index([startsAt])
+}
+
+model Booking {
+  id        String   @id @default(cuid())
+  /// Public code shown on the ticket, e.g. "KD-7K3M9Q"
+  code      String   @unique
+  sessionId String
+  session   Session  @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  name      String
+  /// Normalized: 7XXXXXXXXXX
+  phone     String
+  /// booked | waitlist | attended | no_show | cancelled
+  status    String   @default("booked")
+  /// Seat number 1..capacity while the booking holds a place; null on the waitlist or after cancellation.
+  /// The unique (sessionId, seat) pair makes overbooking impossible at the database level.
+  seat      Int?
+  /// site | program | admin | demo
+  source    String   @default("site")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([sessionId, seat])
+  /// One person cannot hold two bookings for the same class; a cancelled row is reused on rebooking.
+  @@unique([sessionId, phone])
+  @@index([phone])
+}
+
+/// Requests from the site: trial class, program sent to a coach, corporate, kids club, membership.
+model Lead {
+  id         String   @id @default(cuid())
+  /// trial | program | corporate | kids | membership | callback
+  kind       String
+  name       String
+  phone      String
+  email      String?
+  company    String?
+  /// Program builder goal slug or a free-text wish
+  goal       String?
+  age        Int?
+  restingHr  Int?
+  /// Membership plan slug
+  plan       String?
+  /// JSON: the program built by the visitor (zones and picked sessions)
+  program    String?
+  comment    String?
+  /// new | contacted | converted | lost
+  status     String   @default("new")
+  /// site | demo
+  source     String   @default("site")
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@index([createdAt])
+}

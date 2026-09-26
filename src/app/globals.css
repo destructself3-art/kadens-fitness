@@ -1,0 +1,315 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ---------- Tokens: dark sport. Asphalt, chalk, one hot pulse, five heart-rate zones. ---------- */
+:root {
+  color-scheme: dark;
+  --asphalt: 12 11 10;
+  --graphite: 23 21 20;
+  --raised: 33 30 28;
+  --chalk: 242 239 234;
+  --dust: 150 144 137;
+  --line: 242 239 234;
+  --pulse: 255 58 36;
+  --z1: 110 104 98;
+  --z2: 211 154 58;
+  --z3: 255 122 26;
+  --z4: 255 58 36;
+  --z5: 255 230 210;
+  --header-h: 72px;
+}
+
+@layer base {
+  html {
+    background: rgb(var(--asphalt));
+    color: rgb(var(--chalk));
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+    scrollbar-color: rgb(var(--line) / 0.22) transparent;
+  }
+  body {
+    @apply font-sans;
+    font-size: 16.5px;
+    line-height: 1.55;
+    background: rgb(var(--asphalt));
+    min-height: 100svh;
+  }
+  h1,
+  h2,
+  h3 {
+    text-wrap: balance;
+  }
+  p {
+    text-wrap: pretty;
+  }
+  ::selection {
+    background: rgb(var(--pulse) / 0.4);
+    color: rgb(var(--chalk));
+  }
+  :focus-visible {
+    outline: 2px solid rgb(var(--chalk));
+    outline-offset: 3px;
+    border-radius: 6px;
+  }
+  button {
+    -webkit-tap-highlight-color: transparent;
+  }
+  input,
+  select,
+  textarea {
+    color-scheme: dark;
+  }
+}
+
+@layer components {
+  .container-page {
+    width: 100%;
+    max-width: theme("maxWidth.page");
+    margin-inline: auto;
+    padding-inline: clamp(16px, 4vw, 48px);
+  }
+  /* Small uppercase label above headings */
+  .eyebrow {
+    @apply font-sans uppercase text-dust;
+    font-size: 12.5px;
+    font-weight: 600;
+    letter-spacing: 0.16em;
+  }
+  /* Science Gothic headline. Width is set separately with .stretch-* */
+  .display {
+    @apply font-display uppercase;
+    font-weight: 800;
+    font-variation-settings: "wdth" 72;
+  }
+  .stretch-narrow {
+    font-variation-settings: "wdth" 56;
+  }
+  .stretch-normal {
+    font-variation-settings: "wdth" 100;
+  }
+  .stretch-wide {
+    font-variation-settings: "wdth" 130;
+  }
+  .stretch-ultra {
+    font-variation-settings: "wdth" 170;
+  }
+  /* Handjet digits: the treadmill-display look */
+  .digits {
+    @apply font-digits;
+    font-variation-settings: "ELSH" 2;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: 0.01em;
+  }
+  .tabular {
+    font-variant-numeric: tabular-nums;
+  }
+  .card {
+    @apply rounded-card border border-line/10 bg-graphite;
+  }
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 rounded-full font-sans font-semibold transition-[background-color,color,border-color,transform,box-shadow] duration-300 ease-silk;
+    min-height: 48px;
+    padding: 0 22px;
+    font-size: 15px;
+  }
+  .btn:active {
+    transform: scale(0.97);
+  }
+  .btn-primary {
+    @apply btn bg-pulse text-asphalt hover:bg-chalk;
+  }
+  .btn-ghost {
+    @apply btn border border-line/25 text-chalk hover:border-chalk hover:bg-chalk/5;
+  }
+  .btn-quiet {
+    @apply btn px-4 text-dust hover:text-chalk;
+  }
+  .btn[disabled],
+  .btn[aria-disabled="true"] {
+    @apply cursor-not-allowed opacity-50;
+  }
+  .link-underline {
+    background-image: linear-gradient(currentColor, currentColor);
+    background-size: 0% 1px;
+    background-position: 0 100%;
+    background-repeat: no-repeat;
+    transition: background-size 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .link-underline:hover,
+  .link-underline:focus-visible {
+    background-size: 100% 1px;
+  }
+  /* Form fields */
+  .field-label {
+    @apply mb-2 block text-[13.5px] font-medium text-dust;
+  }
+  .field {
+    @apply w-full rounded-xl border border-line/15 bg-asphalt px-4 text-[16px] text-chalk placeholder:text-dust/70 transition-colors duration-200 hover:border-line/30 focus:border-chalk focus:outline-none;
+    min-height: 52px;
+  }
+  textarea.field {
+    @apply py-3;
+  }
+  .field[aria-invalid="true"] {
+    @apply border-pulse;
+  }
+  .field-error {
+    @apply mt-1.5 text-[13.5px] text-pulse;
+  }
+  .chip {
+    @apply inline-flex items-center gap-1.5 rounded-full border border-line/15 px-3 py-1 text-[13px] font-medium text-chalk transition-colors;
+  }
+  .chip[aria-pressed="true"],
+  .chip[aria-selected="true"],
+  .chip[data-active="true"] {
+    @apply border-chalk bg-chalk text-asphalt;
+  }
+  /* Cardiogram paper: a faint red millimetre grid */
+  .ecg-grid {
+    background-image:
+      linear-gradient(rgb(var(--pulse) / 0.09) 1px, transparent 1px),
+      linear-gradient(90deg, rgb(var(--pulse) / 0.09) 1px, transparent 1px),
+      linear-gradient(rgb(var(--pulse) / 0.035) 1px, transparent 1px),
+      linear-gradient(90deg, rgb(var(--pulse) / 0.035) 1px, transparent 1px);
+    background-size:
+      50px 50px,
+      50px 50px,
+      10px 10px,
+      10px 10px;
+  }
+  /* The rubber gym floor: black crumb with grey and scarlet flecks */
+  .rubber {
+    background-color: rgb(var(--asphalt));
+    background-image:
+      radial-gradient(circle at 20% 30%, rgb(242 239 234 / 0.05) 0 1px, transparent 1.6px),
+      radial-gradient(circle at 70% 60%, rgb(255 58 36 / 0.07) 0 1px, transparent 1.6px),
+      radial-gradient(circle at 40% 80%, rgb(150 160 180 / 0.045) 0 1.1px, transparent 1.7px);
+    background-size:
+      23px 19px,
+      31px 37px,
+      17px 29px;
+  }
+}
+
+/* ---------- Film grain over the whole site ---------- */
+.grain {
+  pointer-events: none;
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  opacity: 0.07;
+  mix-blend-mode: screen;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='220' height='220'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.5  0 0 0 0 0.5  0 0 0 0 0.5  0 0 0 1.4 -0.2'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+}
+
+/* ---------- Photo placeholders: the light of the shot, drawn in CSS ---------- */
+.light-study {
+  color: rgb(var(--chalk) / 0.6);
+  background: linear-gradient(160deg, #1d1b1a, #0c0b0a 72%);
+}
+.light-study--pulse {
+  background:
+    radial-gradient(40% 70% at 70% 40%, rgb(255 58 36 / 0.34), transparent 70%),
+    linear-gradient(160deg, #1a1312, #0c0b0a 72%);
+}
+.light-study--steel {
+  background:
+    linear-gradient(180deg, rgb(242 239 234 / 0.12), transparent 40%),
+    linear-gradient(90deg, transparent 0 96%, rgb(255 58 36 / 0.4) 96% 97%, transparent 97%),
+    #151515;
+}
+.light-study--calm {
+  background:
+    radial-gradient(60% 40% at 30% 90%, rgb(211 154 58 / 0.3), transparent 70%),
+    linear-gradient(160deg, #1d1813, #0e0c0a 72%);
+}
+.light-study--water {
+  background:
+    radial-gradient(70% 50% at 50% 80%, rgb(80 200 210 / 0.28), transparent 70%),
+    linear-gradient(180deg, #0c1214, #070a0b);
+}
+.light-study--rim {
+  background:
+    radial-gradient(30% 45% at 50% 45%, rgb(255 122 26 / 0.35), transparent 70%),
+    #0b0a0a;
+}
+.light-study--street {
+  background:
+    linear-gradient(180deg, #0f1a2e, #07090f 60%),
+    #07090f;
+}
+
+/* ---------- Lenis ---------- */
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+.lenis.lenis-smooth [data-lenis-prevent] {
+  overscroll-behavior: contain;
+}
+.lenis.lenis-stopped {
+  overflow: clip;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ---------- Holographic coach cards ---------- */
+.holo {
+  --mx: 50%;
+  --my: 30%;
+  --foil: 0;
+  box-shadow: 0 30px 60px -30px rgb(0 0 0 / 0.9);
+}
+.holo:hover,
+.holo:focus-visible {
+  box-shadow: 0 30px 70px -28px color-mix(in srgb, var(--zone) 45%, transparent);
+}
+.holo-foil {
+  opacity: calc(0.12 + var(--foil) * 0.5);
+  mix-blend-mode: color-dodge;
+  background:
+    repeating-linear-gradient(115deg, transparent 0 6%, rgb(255 255 255 / 0.08) 6% 7%),
+    conic-gradient(from 210deg at var(--mx) var(--my), var(--zone), #6fd6ff, #d6a6ff, #ffe39a, var(--zone));
+  -webkit-mask-image: radial-gradient(circle at var(--mx) var(--my), #000 0 18%, transparent 62%);
+  mask-image: radial-gradient(circle at var(--mx) var(--my), #000 0 18%, transparent 62%);
+  transition: opacity 0.4s ease;
+}
+.holo-glare {
+  opacity: calc(var(--foil) * 0.9);
+  mix-blend-mode: overlay;
+  background: radial-gradient(circle at var(--mx) var(--my), rgb(255 255 255 / 0.55), transparent 42%);
+  transition: opacity 0.4s ease;
+}
+@media (pointer: coarse) {
+  .holo-foil {
+    animation: holo-idle 6s ease-in-out infinite alternate;
+  }
+}
+@keyframes holo-idle {
+  from {
+    --mx: 20%;
+  }
+  to {
+    --mx: 80%;
+  }
+}
+@property --mx {
+  syntax: "<percentage>";
+  inherits: true;
+  initial-value: 50%;
+}

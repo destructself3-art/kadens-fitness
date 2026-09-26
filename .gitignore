@@ -1,0 +1,25 @@
+node_modules/
+.next/
+out/
+*.tsbuildinfo
+next-env.d.ts
+
+# local database and secrets
+prisma/*.db
+prisma/*.db-journal
+.env
+
+# generated Prisma client
+src/generated/
+
+# original photos are large: only the optimized copies in public/photos are committed
+photos-raw/*
+!photos-raw/README.md
+
+.DS_Store
+Thumbs.db
+
+# local tooling / OS
+.claude/
+*.log
+.env*.local
